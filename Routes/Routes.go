@@ -14,6 +14,7 @@ func SetupRoutes(e *echo.Echo) {
 		mido.POST("/products", Controllers.CreateProducts)
 		mido.GET("/config", Controllers.Config)
 		mido.POST("/create-payment-intent", Controllers.HandleCreatePaymentIntent)
+		mido.DELETE("/delete-product/:id", Controllers.DeleteProduct)
 		// Uncomment and implement these if needed
 		// mido.GET("/products/:id", Controllers.GetProductsByID)
 		// mido.PUT("/products/:id", Controllers.UpdateProducts)

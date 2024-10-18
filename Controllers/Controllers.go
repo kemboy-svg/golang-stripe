@@ -36,6 +36,26 @@ func CreateProducts(c echo.Context) error {
 	return c.JSON(http.StatusOK, product)
 }
 
+func DeleteProduct(c echo.Context) error {
+	// Get product ID from the URL parameters
+	productID := c.Param("id")
+
+	// Check if the product exists in the database
+	_, err := Repository.GetAProduct(&Models.Products{}, productID)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{"message": "Product not found"})
+	}
+
+	// Delete the product
+	if err := Repository.DeleteProduct(productID); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"message": "Error deleting product"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{"message": "Product deleted successfully"})
+}
+
+
+
 func Config(c echo.Context) error {
 	err := godotenv.Load()
 	if err != nil {
@@ -47,7 +67,6 @@ func Config(c echo.Context) error {
 	})
 }
 
-// HandleCreatePaymentIntent handles creating a payment intent------------------->
 func HandleCreatePaymentIntent(c echo.Context) error {
 	var product Models.Products
 
@@ -66,14 +85,16 @@ func HandleCreatePaymentIntent(c echo.Context) error {
 
 	fmt.Println("Data==>", data)
 
+	// Multiply the amount by 100 to convert to the smallest currency unit (cents for USD)
+	amountInCents := int64(data.Price * 100)
+
 	// Create a PaymentIntent with amount and currency
 	params := &stripe.PaymentIntentParams{
-		Amount:   stripe.Int64(int64(data.Price)),
+		Amount:   stripe.Int64(amountInCents),
 		Currency: stripe.String(string(stripe.CurrencyUSD)),
 		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
 			Enabled: stripe.Bool(true),
 		},
-		
 	}
 
 	pi, err := paymentintent.New(params)
@@ -86,6 +107,7 @@ func HandleCreatePaymentIntent(c echo.Context) error {
 		"clientSecret": pi.ClientSecret,
 	})
 }
+
 
 
 

@@ -25,3 +25,10 @@ func GetAProduct(product *Models.Products, id string) (Models.Products, error) {
 	err := Config.DB.Where("id = ?", id).First(product).Error
 	return *product, err
 }
+
+func DeleteProduct(productID string) error {
+	if err := Config.DB.Delete(&Models.Products{}, productID).Error; err != nil {
+		return err
+	}
+	return nil
+}
