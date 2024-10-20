@@ -11,6 +11,7 @@ var DB *gorm.DB
 
 // DBConfig represents db configuration
 type DBConfig struct {
+	
 	Host     string
 	Port     int
 	User     string
